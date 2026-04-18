@@ -1,54 +1,58 @@
-// const toBool = (x) => x == 'true'
-const { existsSync } = require('fs')
-if (existsSync('config.env')) require('dotenv').config({ path: './config.env' })
+const { execSync } = require('child_process')
+const fs = require('fs')
+const path = require('path')
 
-module.exports = { 
-    SESSION_ID: process.env.SESSION_ID || 'kord_ai-kX2LOYWEtG0mxbyn',
-    OWNER_NUMBER: process.env.OWNER_NUMBER || "2348053699171",
-    WORKTYPE: process.env.WORKTYPE || "public",
-    PREFIX: process.env.PREFIX || "[.]",
-    ALWAYS_ONLINE: process.env.ALWAYS_ONLINE || true,
-    MONGODB_URI: process.env.MONGODB_URI || "",
-    STATUS_VIEW: process.env.STATUS_VIEW || true,
-    SAVE_STATUS: process.env.SAVE_STATUS || false,
-    LIKE_STATUS: process.env.SAVE_STATUS || true,
-    STATUS_EMOJI: process.env.STATUS_EMOJI || "🥏",
-    ERROR_MSG: process.env.ERROR_MSG || true,
-    TIMEZONE: process.env.TIMEZONE || "Africa/Lagos",
-    CAPTION: process.env.CAPTION || "",
-    STICKER_PACKNAME: process.env.STICKER_PACKNAME || "Kord",
-    STICKER_AUTHOR: process.env.STICKER_AUTHOR || "🤍",
-    BOT_PRESENCE: process.env.BOT_PRESENCE || "available",
-    REACT: process.env.REACT || false,
-    READ_MESSAGE: process.env.READ_MESSAGE || "false",
-    OWNER_NAME: process.env.OWNER_NAME || "Mirage",
-    BOT_NAME: process.env.BOT_NAME || "Kord",
-    RENDER_API_KEY: process.env.RENDER_API_KEY,
-    ANTIDELETE: process.env.ANTIDELETE || "on",
-    ANTIDELETE_INCHAT: process.env.ANTIDELETE_INCHAT || "on",
-    ANTI_EDIT: process.env.ANTI_EDIT || "off",
-    ANTI_EDIT_IN_CHAT: process.env.ANTI_EDIT_IN_CHAT || "on",
-    AUDIO_DATA: process.env.AUDIO_DATA || "Kord;🤍",
-    SUDO: process.env.SUDO || "",
-    MODS: process.env.MODS || "",
-    REJECT_CALL: process.env.REJECT_CALL || "off",
-    WARNCOUNT: process.env.WARNCOUNT || "4",
-    LANG_CODE: process.env.LANG_CODE || "en",
-    VV_CMD: process.env.VV_CMD || "👀",
-    SAVE_CMD: process.env.SAVE_CMD || "📥",
-    RES_TYPE: process.env.RES_TYPE || "text",
-    CMD_REACT: process.env.CMD_REACT || "on",
-    LOG_MESSAGES: process.env.LOG_MESSAGES || "on",
-    STARTUP_MSG: process.env.STARTUP_MSG || "on",
-    MENU_IMAGE: process.env.MENU_IMAGE || "",
-    WELCOME_MESSAGE: process.env.WELCOME_MESSAGE ||  `╭━━━々 𝚆 𝙴 𝙻 𝙲 𝙾 𝙼 𝙴 々━━━╮
-┃ ➺ *々 Welcome @user! to @gname*
-┃ ➺ *々 Members: @count*
-┃ ➺ We Hope You Have A Nice Time Here!
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━`,
-    GOODBYE_MESSAGE: process.env.GOODBYE_MESSAGE || `╭━━━々 𝙶 𝙾 𝙾 𝙳 𝙱 𝚈 𝙴 々━━━╮
-┃ ➺ *々 @user! left @gname!*
-┃ ➺ *々 Members: @count*
-┃ ➺ We Hope He/She Had A Nice Time Here!
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━`
+const config = {
+  SESSION_ID: 'kord_ai-j0OaCOzR4wdltg8w',
+  OWNER_NUMBER: '2349167640176',
+  WORKTYPE: 'private',
+  PREFIX: '[.!?]',
+  TIMEZONE: 'Africa/Lagos',
+  OWNER_NAME: 'beacon',
+  BOT_NAME: 'Kord'
+}
+
+function writeEnvFile(filePath) {
+  const envText = Object.entries(config)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')
+  fs.writeFileSync(filePath, envText)
+  console.log('config.env written')
+}
+
+function moveFilesToRoot(srcDir, destDir) {
+  const files = fs.readdirSync(srcDir, { withFileTypes: true })
+  for (const file of files) {
+    const srcPath = path.join(srcDir, file.name)
+    const destPath = path.join(destDir, file.name)
+
+    if (fs.existsSync(destPath)) {
+      fs.rmSync(destPath, { recursive: true, force: true })
+    }
+
+    fs.renameSync(srcPath, destPath)
+  }
+}
+
+try {
+  console.log('Cloning Kord-Ai...')
+  execSync('git clone https://github.com/M3264/Kord-Ai temp-dir', { stdio: 'inherit' })
+
+  const rootDir = process.cwd()
+  const tempDir = path.join(rootDir, 'temp-dir')
+
+  moveFilesToRoot(tempDir, rootDir)
+  fs.rmdirSync(tempDir, { recursive: true })
+
+  writeEnvFile(path.join(rootDir, 'config.env'))
+
+  console.log('Installing dependencies...')
+  execSync('npm install', { stdio: 'inherit' })
+
+  console.log('Starting bot...')
+  execSync('npm start', { stdio: 'inherit' })
+
+} catch (err) {
+  console.error('Setup failed:', err.message)
+  process.exit(1)
 }
