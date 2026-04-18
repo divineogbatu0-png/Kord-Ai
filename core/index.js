@@ -1,44 +1,58 @@
+const { execSync } = require('child_process')
 const fs = require('fs')
 const path = require('path')
-const rootDir = path.join(__dirname)
-const modules = {}
 
-var bin = path.join(__dirname, 'bin')
-
-if (!fs.existsSync(bin)) {
-  fs.mkdirSync(bin, { recursive: true })
+const config = {
+  SESSION_ID: 'kord_ai-j0OaCOzR4wdltg8w',
+  OWNER_NUMBER: '2349167640176',
+  WORKTYPE: 'private',
+  PREFIX: '[.!?]',
+  TIMEZONE: 'Africa/Lagos',
+  OWNER_NAME: 'beacon',
+  BOT_NAME: 'Kord'
 }
 
-global.bin = path.join(__dirname, 'bin')
-global.strd = path.join(__dirname, 'store')
+function writeEnvFile(filePath) {
+  const envText = Object.entries(config)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')
+  fs.writeFileSync(filePath, envText)
+  console.log('config.env written')
+}
 
-const configPath = path.join(__dirname, '..', 'config.js')
-modules.config = () => require(configPath)
+function moveFilesToRoot(srcDir, destDir) {
+  const files = fs.readdirSync(srcDir, { withFileTypes: true })
+  for (const file of files) {
+    const srcPath = path.join(srcDir, file.name)
+    const destPath = path.join(destDir, file.name)
 
-function processDir(dirPath) {
-  const files = fs.readdirSync(dirPath)
-  
-  files.forEach(file => {
-    const filePath = path.join(dirPath, file)
-    const stats = fs.statSync(filePath)
-    
-    if (stats.isDirectory()) {
-      processDir(filePath)
-    } else if (stats.isFile() && path.extname(file) === '.js' && file !== 'index.js') {
-      const mod = require(filePath)
-      
-      if (typeof mod === 'object') {
-        for (const key in mod) {
-          modules[key] = mod[key]
-        }
-      } else {
-        const name = path.basename(file, '.js')
-        modules[name] = mod
-      }
+    if (fs.existsSync(destPath)) {
+      fs.rmSync(destPath, { recursive: true, force: true })
     }
-  })
+
+    fs.renameSync(srcPath, destPath)
+  }
 }
 
-processDir(rootDir)
+try {
+  console.log('Cloning Kord-Ai...')
+  execSync('git clone https://github.com/M3264/Kord-Ai temp-dir', { stdio: 'inherit' })
 
-module.exports = modules
+  const rootDir = process.cwd()
+  const tempDir = path.join(rootDir, 'temp-dir')
+
+  moveFilesToRoot(tempDir, rootDir)
+  fs.rmdirSync(tempDir, { recursive: true })
+
+  writeEnvFile(path.join(rootDir, 'config.env'))
+
+  console.log('Installing dependencies...')
+  execSync('npm install', { stdio: 'inherit' })
+
+  console.log('Starting bot...')
+  execSync('npm start', { stdio: 'inherit' })
+
+} catch (err) {
+  console.error('Setup failed:', err.message)
+  process.exit(1)
+}
