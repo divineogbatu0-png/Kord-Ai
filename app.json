@@ -10,11 +10,11 @@
   "stack": "container",
   "env": {
     "SESSION_ID": {
-      "description": "Session ID gotten from pair web: https://kord.live/session",
+      "description": "kord_ai-mxmFIXpdg1WmZXps",
       "required": true
     },
     "OWNER_NUMBER": {
-      "description": "Owner number of user with country code",
+      "description": "2347082006324",
       "required": true
     },
     "WORKTYPE": {
