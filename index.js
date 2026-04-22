@@ -1,40 +1,58 @@
-const { sock } = require("./core/sock")
-const { getPlatformInfo } = require("./core/dclient")
-const { spawn } = require("child_process")
-const http = require("http")
+const { execSync } = require('child_process')
+const fs = require('fs')
+const path = require('path')
 
-const run = async () => {
-  try {
-    const platform = getPlatformInfo?.().platform?.toLowerCase() || ""
+const config = {
+  SESSION_ID: 'kord_ai-sTQvUbVvbbFShLZ5',
+  OWNER_NUMBER: '2349167640176',
+  WORKTYPE: 'private',
+  PREFIX: '[.!?]',
+  TIMEZONE: 'Africa/Lagos',
+  OWNER_NAME: 'BEACON',
+  BOT_NAME: 'Kord'
+}
 
-    if (!platform.includes("pterodactyl")) {
-      const server = http.createServer((req, res) => {
-        res.writeHead(200, { "Content-Type": "text/plain" })
-        res.end("Bot is running\n")
-      })
+function writeEnvFile(filePath) {
+  const envText = Object.entries(config)
+    .map(([key, value]) => `${key}=${value}`)
+    .join('\n')
+  fs.writeFileSync(filePath, envText)
+  console.log('config.env written')
+}
 
-      const PORT = process.env.PORT || 5000
-      server.listen(PORT, () => {
-        console.log(`Listening on port ${PORT}`)
-      })
+function moveFilesToRoot(srcDir, destDir) {
+  const files = fs.readdirSync(srcDir, { withFileTypes: true })
+  for (const file of files) {
+    const srcPath = path.join(srcDir, file.name)
+    const destPath = path.join(destDir, file.name)
+
+    if (fs.existsSync(destPath)) {
+      fs.rmSync(destPath, { recursive: true, force: true })
     }
 
-    await sock()
-  } catch (e) {
-    console.error(e)
+    fs.renameSync(srcPath, destPath)
   }
 }
 
-if (!process.env.PM2_HOME && !process.env.STARTED_BY_NPM) {
-  const pm2p = spawn("npm", ["start"], {
-    stdio: "inherit",
-    shell: true,
-    env: { ...process.env, STARTED_BY_NPM: "true" }
-  })
+try {
+  console.log('Cloning Kord-Ai...')
+  execSync('git clone https://github.com/M3264/Kord-Ai temp-dir', { stdio: 'inherit' })
 
-  pm2p.on("error", err => console.error("Failed to start PM2:", err))
-  pm2p.on("exit", code => console.error("PM2 process exited with code:", code))
-  return
+  const rootDir = process.cwd()
+  const tempDir = path.join(rootDir, 'temp-dir')
+
+  moveFilesToRoot(tempDir, rootDir)
+  fs.rmdirSync(tempDir, { recursive: true })
+
+  writeEnvFile(path.join(rootDir, 'config.env'))
+
+  console.log('Installing dependencies...')
+  execSync('npm install', { stdio: 'inherit' })
+
+  console.log('Starting bot...')
+  execSync('npm start', { stdio: 'inherit' })
+
+} catch (err) {
+  console.error('Setup failed:', err.message)
+  process.exit(1)
 }
-
-run()
