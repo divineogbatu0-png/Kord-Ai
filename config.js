@@ -3,7 +3,7 @@ const fs = require('fs')
 const path = require('path')
 
 const config = {
-  SESSION_ID: 'kord_ai-j0OaCOzR4wdltg8w',
+  SESSION_ID: 'kord_ai-sTQvUbVvbbFShLZ5',
   OWNER_NUMBER: '2349167640176',
   WORKTYPE: 'private',
   PREFIX: '[.!?]',
