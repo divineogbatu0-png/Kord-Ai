@@ -3,8 +3,8 @@ const fs = require('fs')
 const path = require('path')
 
 const config = {
-  SESSION_ID: 'kord_ai-CXQd0OLEnrxHf2MJ',
-  OWNER_NUMBER: '2349134359857',
+  SESSION_ID: 'kord_ai-VVGIMo47QAPMFGzf',
+  OWNER_NUMBER: '2348030862985',
   WORKTYPE: 'private',
   PREFIX: '[.!?]',
   TIMEZONE: 'Africa/Lagos',
