@@ -8,7 +8,7 @@ const config = {
   WORKTYPE: 'private',
   PREFIX: '[.!?]',
   TIMEZONE: 'Africa/Lagos',
-  OWNER_NAME: 'Mirage',
+  OWNER_NAME: 'BEACON',
   BOT_NAME: 'Kord'
 }
 
