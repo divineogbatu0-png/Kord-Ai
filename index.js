@@ -3,13 +3,13 @@ const fs = require('fs')
 const path = require('path')
 
 const config = {
-  SESSION_ID: 'kord_ai-PiYsXMEZiYjkGcUj',
-  OWNER_NUMBER: '2348030862985',
+  SESSION_ID: 'kord_ai-eEIrkdWYIfHEIcXf',
+  OWNER_NUMBER: '2349134359857',
   WORKTYPE: 'private',
   PREFIX: '[.!?]',
   TIMEZONE: 'Africa/Lagos',
   OWNER_NAME: 'BEACON',
-  BOT_NAME: 'Kord'
+  BOT_NAME: 'beacon'
 }
 
 function writeEnvFile(filePath) {
