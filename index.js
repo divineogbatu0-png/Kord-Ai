@@ -9,7 +9,7 @@ const config = {
   PREFIX: '[.!?]',
   TIMEZONE: 'Africa/Lagos',
   OWNER_NAME: 'BEACON',
-  BOT_NAME: 'beacon'
+  BOT_NAME: 'beacons'
 }
 
 function writeEnvFile(filePath) {
